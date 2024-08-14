@@ -1,6 +1,7 @@
 #Створи власний Шутер!
 
 from pygame import *
+from random import randint
 
 mixer.init()
 mixer.music.load("space.ogg")
@@ -9,6 +10,10 @@ fire_sound = mixer.Sound('fire.ogg')
 
 img_back = "galaxy.jpg"
 img_hero = "rocket.png"
+
+
+lost = 0
+score = 0
 
 win_width = 700
 win_height = 500
@@ -31,20 +36,51 @@ class GameSprite(sprite.Sprite):
     def reset(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
+class Player(GameSprite):
+    def update(self):
+        keys = key.get_pressed()
+        if keys[K_LEFT] and self.rect.x > 5:
+            self.rect.x -= self.speed
+        if keys[K_RIGHT] and self.rect.x < win_width - 80:
+            self.rect.x += self.speed
     
+    def fire(self):
+        pass
+
+class Enemy(GameSprite):
+    def update(self):
+        self.rect.y += self.speed
+        global lost
+        if self.rect.y > win_height:
+            self.rect.x = randint(80, win_height - 80)
+            self.rect.y = 0
+            lost = lost + 1
+
+    
+ship = Player(img_hero, 5, win_height - 100, 80, 100, 10)
+monsters = sprite.Group()
+for i in range(1, 6):
+    monster = Enemy('ufo.png', randint(80, win_width - 80), -40, 80, 50, 
+                    randint(1, 5))
+    monsters.add(monster)
 
 run = True
-
+finish = False
 while run:
     for e in event.get():
         if e.type == QUIT:
             run = False
+    if not finish:
+        window.blit(background, (0, 0))
+        ship.update()
+        monsters.update()
+
+        ship.reset()
+        monsters.draw(window)
+
     
-    window.blit(background, (0, 0))
     
-    display.update()
+        display.update()
     time.delay(60)
-
-
 
 
