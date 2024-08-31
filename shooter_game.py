@@ -20,6 +20,8 @@ lose = font1.render('YOU LOSE!', True, (180, 0, 0))
 
 lost = 0
 score = 0
+max_lost = 3
+goal = 10
 
 win_width = 700
 win_height = 500
@@ -103,7 +105,19 @@ while run:
         monsters.draw(window)
         bullets.draw(window)
 
-    
+        collides = sprite.groupcollide(monsters, bullets, True, True)
+        for c in collides:
+            score = score + 1
+            monster = Enemy('ufo.png', randint(80, win_width - 80), -40, 80, 50, randint(1,5))
+            monsters.add(monster)
+        
+        if score >= goal:
+            finish = True
+            window.blit(win, (200, 200))
+        
+        if sprite.spritecollide(ship, monsters, False) or lost >= max_lost:
+            finish = True
+            window.blit(lose, (200, 200))
     
         display.update()
     time.delay(60)
